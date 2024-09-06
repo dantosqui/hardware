@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/(tabs)/contactos.jsx", "app/(tabs)/nroEmergencia.jsx", "app/(tabs)/index.jsx"  ]
 }

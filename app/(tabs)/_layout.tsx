@@ -6,6 +6,8 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
+
+  
   
 //quiero agradecer a la aplicacion default de react por dejarme usar sus tabs
   return ( 
@@ -32,6 +34,17 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+      name='contactos'
+      options={{
+        title:'contactos',
+        tabBarIcon: ({color}) => (
+          <TabBarIcon name={'search'} color={color} />
+        ),
+      }}
+      />
+      
+      
     </Tabs>
   );
 }
