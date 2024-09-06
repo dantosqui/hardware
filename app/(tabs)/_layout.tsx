@@ -6,12 +6,12 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
+  
+//quiero agradecer a la aplicacion default de react por dejarme usar sus tabs
+  return ( 
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        
         headerShown: false,
       }}>
       <Tabs.Screen
@@ -24,9 +24,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="nroEmergencia"
         options={{
-          title: 'Explore',
+          title: 'Nro. Emergencia',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
