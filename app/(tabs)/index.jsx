@@ -1,77 +1,50 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, PermissionsAndroid, Platform } from 'react-native';
+import { Platform, Text, View, StyleSheet } from 'react-native';
+import * as Location from 'expo-location';
 import axios from 'axios';
-import Geolocation from 'react-native-geolocation-service';
 import { VibrationContext } from '../contexto'; // Adjust the path as needed
 
-const API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY'; // Replace with your actual API key
+const API_KEY = '9125d03f7bcdefb949b35cc42547abc5'; // Replace with your actual API key
 
 export default function HomeScreen() {
   const { triggerVibration } = useContext(VibrationContext);
-  
-  const [temperature, setTemperature] = useState(null);
-  const [date, setDate] = useState(new Date());
   const [location, setLocation] = useState(null);
+  const [temperature, setTemperature] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
-    // Request location permission (Android only)
-    const requestPermission = async () => {
-      if (Platform.OS === 'android') {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-              title: 'Location Permission',
-              message: 'dame acceso quiero saber donde estas.',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            }
-          );
-          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('Location permission denied');
-            return;
-          }
-        } catch (err) {
-          console.warn(err);
-        }
+    (async () => {
+      // Request location permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
       }
-    };
 
-    requestPermission();
+      // Fetch the current location
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
 
-    // Fetch location and weather data
-    const fetchLocationAndWeather = () => {
-      Geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation({ latitude, longitude });
-          
-          // Fetch weather data
-          axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
+      // Fetch weather data using OpenWeatherMap API
+      if (location) {
+        try {
+          const { latitude, longitude } = location.coords;
+          const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
             params: {
               lat: latitude,
               lon: longitude,
               appid: API_KEY,
-              units: 'metric', // Use 'imperial' for Fahrenheit
+              units: 'metric', // 'imperial' for Fahrenheit
             },
-          })
-          .then(response => {
-            setTemperature(response.data.main.temp);
-          })
-          .catch(error => {
-            console.error('Error fetching weather data:', error);
           });
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+          setTemperature(response.data.main.temp);
+        } catch (error) {
+          console.error('Error fetching weather data:', error);
           triggerVibration([500, 500, 500]); // Vibrate if there's an error
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
-    };
-
-    fetchLocationAndWeather();
+        }
+      }
+    })();
 
     // Update date and time every second
     const interval = setInterval(() => {
@@ -90,10 +63,23 @@ export default function HomeScreen() {
       <Text>Hola, bienvenidos HOLA</Text>
       <Text>Podéis usar las tabs debajo para navegar por la aplicación</Text>
       <Text>Fecha y Hora: {formatDate(date)}</Text>
-      {temperature !== null ? (
-        <Text>Temperatura actual: {temperature}°C</Text>
+      {errorMsg ? (
+        <Text>{errorMsg}</Text>
       ) : (
-        <Text>Cargando temperatura...</Text>
+        <>
+          {location ? (
+            <>
+          <Text>Ubicación actual:</Text>
+          <Text>Latitud: { JSON.stringify(location.coords.latitude) }</Text>
+          <Text>Longitud: { JSON.stringify(location.coords.longitude)}</Text>
+          </>
+          ) : (<Text>'Cargando ubicación...'</Text>) } 
+          {temperature !== null ? (
+            <Text>Temperatura actual: {temperature}°C</Text>
+          ) : (
+            <Text>Cargando temperatura...</Text>
+          )}
+        </>
       )}
     </View>
   );
