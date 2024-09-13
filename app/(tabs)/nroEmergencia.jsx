@@ -10,9 +10,8 @@ export default function TabTwoScreen() {
   useEffect(() => {
     const fetchNumber = async () => {
       const nro = await AsyncStorage.getItem('nro');
-      console.log("numero",nro)
       if (nro) {
-        setNroEmergencia(nro);
+        setNroEmergencia(nro.replace('+54 9 11 ', '')); // Remove prefix from stored number
       }
     };
     fetchNumber();
@@ -20,9 +19,9 @@ export default function TabTwoScreen() {
 
   const formatNumber = (number) => {
     const cleanNumber = number.replace(/\D/g, '');
-    const match = cleanNumber.match(/^(\d{2})(\d{0,4})(\d{0,4})$/);
+    const match = cleanNumber.match(/^(\d{0,4})(\d{0,4})$/);
     if (match) {
-      return `${match[1]}-${match[2]}${match[3] ? '-' + match[3] : ''}`;
+      return `${match[1]}${match[2] ? '-' + match[2] : ''}`;
     }
     return number;
   };
@@ -33,35 +32,46 @@ export default function TabTwoScreen() {
   };
 
   const validarNumero = (numero) => {
-    const regex = /^\d{2}-\d{4}-\d{4}$/;
+    const regex = /^\d{4}-\d{4}$/;
     return regex.test(numero);
   };
 
   const actualizarNroEmergencia = async () => {
     if (validarNumero(nroEmergencia)) {
-      setNroEmergencia("+54 9 "+ nroEmergencia)
-      await AsyncStorage.setItem('nro', nroEmergencia);
+      await AsyncStorage.setItem('nro', "+54 9 11 " + nroEmergencia);
       ToastAndroid.show('Número de emergencia actualizado', ToastAndroid.SHORT);
     } else {
       triggerVibration([500, 500, 500]); // Vibrate if the number is invalid
-
     }
+  };
+
+  const clearNumber = async () => {
+    await AsyncStorage.removeItem('nro');
+    setNroEmergencia('');
+    ToastAndroid.show('Número de emergencia borrado', ToastAndroid.SHORT);
   };
 
   return (
     <View style={styles.container}>
-      <Text>Numero de emergencia</Text>
-      <TextInput
-        keyboardType='numeric'
-        style={styles.input}
-        placeholder="xx-xxxx-xxxx"
-        placeholderTextColor="#888"
-        value={nroEmergencia}
-        onChangeText={handleChangeText}
-      />
+      <View style={styles.prefixContainer}>
+        <Text style={styles.prefix}>+54 9 11 </Text>
+        <TextInput
+          keyboardType='numeric'
+          style={styles.input}
+          placeholder="xxxx-xxxx"
+          placeholderTextColor="#888"
+          value={nroEmergencia}
+          onChangeText={handleChangeText}
+        />
+      </View>
       <Button
         title='Actualizar'
         onPress={actualizarNroEmergencia}
+      />
+      <Button
+        title='Clear'
+        onPress={clearNumber}
+        color='red'
       />
     </View>
   );
@@ -74,14 +84,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
   },
+  prefixContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  prefix: {
+    fontSize: 18,
+    color: '#333',
+  },
   input: {
     height: 40,
-    width: '80%',
+    width: '60%',
     borderColor: '#888',
     borderWidth: 1,
     paddingHorizontal: 10,
     borderRadius: 5,
     backgroundColor: '#fff',
     color: '#333',
+    marginLeft: 5,
   },
 });

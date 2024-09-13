@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Platform, Text, View, StyleSheet } from 'react-native';
+import { Platform, Text, View, StyleSheet, ToastAndroid } from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import { VibrationContext } from '../contexto'; // Adjust the path as needed
@@ -40,7 +40,7 @@ export default function HomeScreen() {
           });
           setTemperature(response.data.main.temp);
         } catch (error) {
-          console.error('Error fetching weather data:', error);
+          ToastAndroid.show('Error fetching weather data:'+ error,ToastAndroid.SHORT);
           triggerVibration([500, 500, 500]); // Vibrate if there's an error
         }
       }

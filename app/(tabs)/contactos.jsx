@@ -33,8 +33,10 @@ export default function Contactos() {
 
     const renderItem = ({ item }) => {
         const phoneNumber = item.phoneNumbers && item.phoneNumbers.length > 0 ? item.phoneNumbers[0].number : '';
+        let cleanEmergencia
+        if (nroEmergencia) {cleanEmergencia= cleanPhoneNumber(nroEmergencia)}
+        else cleanEmergencia="0"
         const cleanedNumber = cleanPhoneNumber(phoneNumber);
-        const cleanEmergencia= cleanPhoneNumber(nroEmergencia)
         console.log(cleanedNumber,cleanEmergencia)
 
         return (
