@@ -3,14 +3,14 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const nroEmergencia = AsyncStorage.getItem("nro"); // Define the emergency number for comparison
-
 export default function Contactos() {
     const [contacts, setContacts] = useState([]);
-    console.log("nro",AsyncStorage.getItem("nro"))
-    
+    const [nroEmergencia, setNroEmergencia] = useState("");
+
     useEffect(() => {
         (async () => {
+            setNroEmergencia(await AsyncStorage.getItem("nro"));
+            
             const { status } = await Contacts.requestPermissionsAsync();
             if (status === 'granted') {
                 const { data } = await Contacts.getContactsAsync({
@@ -18,8 +18,6 @@ export default function Contactos() {
                 });
 
                 setContacts(data);
-
-                
             }
         })();
     }, []);
@@ -29,13 +27,15 @@ export default function Contactos() {
     };
 
     const cleanPhoneNumber = (nro) => {
-        // Clean the phone number by removing spaces and plus signs
-        return nro.replace(/[\s+]/g, ''); // Use regex to remove spaces and '+'
+        // Remove spaces, hyphens, and plus signs
+        return nro.replace(/[\s\-+]/g, ''); // Use regex to remove spaces, hyphens, and '+' signs
     };
 
     const renderItem = ({ item }) => {
         const phoneNumber = item.phoneNumbers && item.phoneNumbers.length > 0 ? item.phoneNumbers[0].number : '';
         const cleanedNumber = cleanPhoneNumber(phoneNumber);
+        const cleanEmergencia= cleanPhoneNumber(nroEmergencia)
+        console.log(cleanedNumber,cleanEmergencia)
 
         return (
             <View style={styles.contactItem}>
@@ -45,7 +45,7 @@ export default function Contactos() {
                 {phoneNumber ? (
                     <Text style={styles.phoneText}>
                         {phoneNumber}
-                        {cleanedNumber === nroEmergencia ? ' ⚠️' : ''} {/* Compare directly with the cleaned emergency number */}
+                        {cleanedNumber === cleanEmergencia ? ' ⚠️' : ''} {/* Compare directly with the cleaned emergency number */}
                     </Text>
                 ) : null}
             </View>

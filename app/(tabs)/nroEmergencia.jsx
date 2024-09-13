@@ -10,6 +10,7 @@ export default function TabTwoScreen() {
   useEffect(() => {
     const fetchNumber = async () => {
       const nro = await AsyncStorage.getItem('nro');
+      console.log("numero",nro)
       if (nro) {
         setNroEmergencia(nro);
       }
@@ -38,6 +39,7 @@ export default function TabTwoScreen() {
 
   const actualizarNroEmergencia = async () => {
     if (validarNumero(nroEmergencia)) {
+      setNroEmergencia("+54 9 "+ nroEmergencia)
       await AsyncStorage.setItem('nro', nroEmergencia);
       ToastAndroid.show('Número de emergencia actualizado', ToastAndroid.SHORT);
     } else {
