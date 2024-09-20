@@ -2,7 +2,7 @@ import { View } from "react-native";
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useEffect, useState } from "react";
 import { Text, Button, StyleSheet, TouchableOpacity, Modal, Pressable } from "react-native";
-import { QRCode } from 'react-native-qrcode-svg';
+import  QRCode  from 'react-native-qrcode-svg';
 
 export default function About() {
   const [facing, setFacing] = useState('back');
