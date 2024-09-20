@@ -13,6 +13,9 @@ export function Navbar() {
       <Link href="/contactos" style={styles.link}>
         <Text>Contactos</Text>
       </Link>
+      <Link href="/about">
+      <Text>Acerca de</Text>
+      </Link>
     </View>
   );
 }
@@ -23,6 +26,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 10,
     backgroundColor: '#ccc',
+    paddingTop:100
   },
   link: {
     fontSize: 16,
